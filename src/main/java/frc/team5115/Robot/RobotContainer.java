@@ -14,8 +14,7 @@ import frc.team5115.Commands.Subsystems.Shooter.Auto.DelayShootGroupAuto;
 import frc.team5115.Commands.*;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import frc.team5115.Commands.NewAuto.AutoCommandGroup;
-import frc.team5115.Commands.NewAuto.Adjust.AdjustDistance;
+
 
 public class RobotContainer {
 
@@ -26,9 +25,8 @@ public class RobotContainer {
     public Climber climber;
     public final Joystick joy = new Joystick(0);
     public final Limelight limelight = new Limelight();
-    public Camera camera; 
     public Timer timer;
-    public AutoCommandGroup autocommandgroup;
+    
 
     public RobotContainer() {
         drivetrain = new Drivetrain();
@@ -36,9 +34,7 @@ public class RobotContainer {
         shooter = new Shooter();
         feeder = new Feeder();
         climber = new Climber();
-        camera = new Camera();
 
-        autocommandgroup = new AutoCommandGroup(intake, feeder, shooter, drivetrain, camera);
         timer = new Timer();
         timer.reset();
         configureButtonBindings();
@@ -49,11 +45,7 @@ public class RobotContainer {
         //new JoystickButton(joy, SHOOTER_BUTTON_ID).whileHeld(new DelayShootGroupAuto(intake, feeder, shooter)).whenReleased(new Stopeverything(intake, feeder, shooter));
         new JoystickButton(joy, SHOOTER_BUTTON_ID).whileHeld(new DelayShootGroup1(intake, feeder, shooter)).whenReleased(new Stopeverything(intake, feeder, shooter));
         
-      /*  new JoystickButton(joy, LEFT_CLIMBER_UP_BUTTON_ID).whileHeld(new LeftForwardClimb(climber)).whenReleased(new InstantCommand(climber::leftStop));
-        new JoystickButton(joy, RIGHT_CLIMBER_UP_BUTTON_ID).whileHeld(new RightForwardClimb(climber)).whenReleased(new InstantCommand(climber::rightStop));
-        new JoystickButton(joy, LEFT_CLIMBER_DOWN_BUTTON_ID).whileHeld(new LeftReverseClimb(climber)).whenReleased(new InstantCommand(climber::leftStop));
-        new JoystickButton(joy, RIGHT_CLIMBER_DOWN_BUTTON_ID).whileHeld(new RightReverseClimb(climber)).whenReleased(new InstantCommand(climber::rightStop));
-      */
+     
         new JoystickButton(joy, LEFT_CLIMBER_UP_BUTTON_ID).whileHeld(new InstantCommand(climber::leftForwardClimb)).whenReleased(new InstantCommand(climber::leftStop));
         new JoystickButton(joy, RIGHT_CLIMBER_UP_BUTTON_ID).whileHeld(new InstantCommand(climber::rightForwardClimb)).whenReleased(new InstantCommand(climber::rightStop));
         new JoystickButton(joy, LEFT_CLIMBER_DOWN_BUTTON_ID).whileHeld(new InstantCommand(climber::leftReverseClimb)).whenReleased(new InstantCommand(climber::leftStop));
@@ -61,8 +53,6 @@ public class RobotContainer {
       //  new JoystickButton(joy, 7).whileHeld(new InstantCommand(intake::reverseIntake(-.25)).alongWith(new InstantCommand(feeder::reverseFeeder))).whenReleased(new Stopeverything(intake, feeder, shooter));
         new JoystickButton(joy, 8).whenPressed(new ReverseFeeder(intake, feeder));
 
-        new JoystickButton(joy, 9).whileHeld(new InstantCommand(drivetrain::oliviaMode)).whenReleased(new InstantCommand(drivetrain::adultMode));
-   
         //new JoystickButton(joy, 10).whileHeld(new AdjustDistance(drivetrain, camera)).whenReleased(new InstantCommand(drivetrain::letGo));
 
     }
@@ -77,7 +67,6 @@ public class RobotContainer {
    static class driveDefaultCommand extends CommandBase {
         Drivetrain drivetrain;
         Joystick joy;
-        Camera camera;
 
         public driveDefaultCommand(Drivetrain drivetrain, Joystick joystick) {
             addRequirements(drivetrain);
@@ -89,39 +78,23 @@ public class RobotContainer {
         @Override
         public void execute() {
            drivetrain.MecanumSimpleDrive(joy.getRawAxis(4), joy.getRawAxis(1), joy.getRawAxis(0));
-           drivetrain.DistanceDetectionAverage();
      
         }    
     }
 
 
     public void startTeleop(){
-        System.out.println("Starting teleop");
+        System.out.println("THIS IS DEMO CODE");
         new Stopeverything(intake, feeder, shooter);
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
-        //drivetrain.resetEncoder();
-        if (autocommandgroup != null) {
-            autocommandgroup.cancel();
-          }
-  
-    }
-
-    public void startAuto(){
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(1);
-        //drivetrain.resetEncoder();
-        if (autocommandgroup != null) {
-            autocommandgroup.schedule();
-          }
         
     }
 
-    public void autoPeriod(){
-      //  drivetrain.printEncoderDistance();
-       // drivetrain.DistanceDetectionAverage();
+    public void startAuto(){}
 
-        }
+    public void autoPeriod(){}
+
     public void teleopPeriodic(){
         //climber.print();
     }
 
-    }
+  }

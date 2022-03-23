@@ -27,28 +27,11 @@ public class Drivetrain extends SubsystemBase{
     private double frontRightSpeed;
     private double backLeftSpeed;
     private double backRightSpeed;
-    public NetworkTable ShooterCam;
-    public NetworkTableEntry ty;
-    public NetworkTableEntry tx;
-    public NetworkTableEntry tv;
 
     private double rightSpd;
     private double leftSpd;
 
-    public double d;
-    public double AverageDistanceDetector1;
-    public double distancefromrobot;
-    public boolean balldetected;
-
-    public double backLeftEncoder;
-    public double backRightEncoder;
-
     public double throttle;
-    public boolean letgo;
-    private Timer timer;
-   // public double xAngle;
-    //public double detector;
- 
     
     public Drivetrain() {
         frontLeft = new TalonSRX(FRONT_LEFT_MOTOR_ID);
@@ -56,31 +39,11 @@ public class Drivetrain extends SubsystemBase{
         backLeft = new TalonSRX(BACK_LEFT_MOTOR_ID);
         backRight = new TalonSRX(BACK_RIGHT_MOTOR_ID);
 
-        AverageDistanceDetector1 = 0;
-        balldetected = false;
-
-        timer = new Timer();
-        timer.reset();
-        
-        
-        frontLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-        frontRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-        backLeft.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-        backRight.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-
-        //xAngle = tx.getDouble(0); 
-        //detector = ty.getDOuble(0;
-
-        throttle = 1;
-        
+        throttle = .25;
     }
 
     public void stop() {
         plugAndChugDrive(0, 0, 0, 0);
-    }
-
-    public void resetGyro(){
-      //  gyro.reset();
     }
 
     public void TankDrive(double x, double y, double throttle) { 
@@ -124,122 +87,5 @@ public class Drivetrain extends SubsystemBase{
         backLeft.set(ControlMode.PercentOutput, backleftspeed*throttle);
         backRight.set(ControlMode.PercentOutput, backrightspeed*throttle);
     }
-
-    public void autodrive(){
-        plugAndChugDrive(0.30, -0.30, 0.30, -0.30);
-        System.out.println("autodrive");
-    }
-
-    public void backwardsdrive(){
-        plugAndChugDrive(-0.30, -0.30, -0.30, -0.30);
-    }
-
-    public void printEncoderDistance(){
-        //backLeftEncoder = -backLeft.getSelectedSensorPosition()*ENCODER_CALIBRATION;
-        backRightEncoder = backRight.getSelectedSensorPosition()*ENCODER_CALIBRATION;
-        backLeftEncoder = backRight.getSelectedSensorPosition()*ENCODER_CALIBRATION;
-        System.out.println(backRightEncoder);
-        }
-    
-    public void resetEncoder(){
-            backLeft.setSelectedSensorPosition(0);
-            backRight.setSelectedSensorPosition(0);
-        }
-    
-    public void DistanceDetectionAverage(){
-        ShooterCam = NetworkTableInstance.getDefault().getTable("limelight");
-            ty = ShooterCam.getEntry("ty");
-            tx = ShooterCam.getEntry("tx");
-            tv = ShooterCam.getEntry("tv");
-           //System.out.print(ty.getDouble(0));
-           //System.out.print(tx.getDouble(0));
-        } 
-
-    public void AdjustAngle(){
-        double xangle = -tx.getDouble(0); 
-        double detector = tv.getDouble(0);
-        leftSpd = -xangle*kD;
-        if(leftSpd > 0.3){
-            leftSpd = 0.3;
-            System.out.println("capping speed");
-        }
-        if(leftSpd < -0.3){
-            leftSpd = -0.3;
-            System.out.println("capping speed");
-        }
-        rightSpd = leftSpd;
-        if(!(detector == 1)){
-            leftSpd = 0;
-            rightSpd = 0;
-            System.out.print("nothing detected");
-        }
-
-        plugAndChugDrive(leftSpd, rightSpd, leftSpd, rightSpd);
-        System.out.println("left speed "+ leftSpd);
-        System.out.println("right speed "+ rightSpd);
-    }
-
-    public double getX(){
-        return tx.getDouble(0);
-    }
-
-    public double getY(){
-        return ty.getDouble(0);
-    }
-
-    public void letGo(){
-        timer.start();
-        letgo = true;
-        while(timer.get()<0.5){
-
-        }
-        letgo = false;
-        NetworkTableInstance.getDefault().getTable("limelight").getEntry("pipeline").setNumber(0);
-    }
-
-    public void oliviaMode(){
-        throttle = 0.3;
-    }
-
-    public void adultMode(){
-        throttle =1;
-    }
-
-    // public double getDistanceFromHub(){
-    //     double yAngle = ty.getDouble(0);
-    //     d = (AUTO_HIGH_GOAL_HEIGHT - AUTO_CAMERA_HEIGHT) / tan(toRadians(yAngle + AUTO_CAMERA_ANGLE));
-    //     return d;
-    // }
-
-    public void AdjustDistance(){
-        
-        DistanceDetectionAverage();
-        double dectector = tv.getDouble(0);
-        if(dectector == 1){
-        /**d = (AUTO_HIGH_GOAL_HEIGHT - AUTO_CAMERA_HEIGHT) / tan(toRadians(yangle + AUTO_CAMERA_ANGLE));
-       
-            leftSpd = (d-HUB_DISTANCE)*hD;
-            rightSpd = -(d - HUB_DISTANCE)*hD;
-            */
-            double yangle = ty.getDouble(0); 
-
-            leftSpd = -(TARGET_ANGLE - yangle)*hD;
-            if(leftSpd > 0.3){
-                leftSpd = 0.3;
-                System.out.println("adjust dist capping speed");
-            }
-            if(leftSpd<-0.3){
-                leftSpd =-0.3;
-                System.out.println("adjust dist capping speed");
-            }
-            rightSpd = -leftSpd;
-        }
-        else{
-            leftSpd = -0.15;
-            rightSpd = 0.15;
-            System.out.println("adjust distance stopped");
-        }
-        plugAndChugDrive(leftSpd, rightSpd, leftSpd, rightSpd);
-        
-    }
+ 
 }
